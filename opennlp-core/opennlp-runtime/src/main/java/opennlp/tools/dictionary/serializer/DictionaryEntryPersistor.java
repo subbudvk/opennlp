@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -42,6 +41,7 @@ import org.xml.sax.helpers.AttributesImpl;
 
 import opennlp.tools.dictionary.Dictionary;
 import opennlp.tools.util.InvalidFormatException;
+import opennlp.tools.util.XmlUtil;
 import opennlp.tools.util.StringList;
 import opennlp.tools.util.model.UncloseableInputStream;
 
@@ -53,7 +53,6 @@ import opennlp.tools.util.model.UncloseableInputStream;
  */
 public class DictionaryEntryPersistor {
   
-  private static final SAXParserFactory SAX_PARSER_FACTORY = SAXParserFactory.newInstance();
   private static final String SAX_FEATURE_NAMESPACES = "http://xml.org/sax/features/namespaces";
 
   // TODO: should check for invalid format, make it save
@@ -230,7 +229,7 @@ public class DictionaryEntryPersistor {
 
     XMLReader xmlReader;
     try {
-      xmlReader = SAX_PARSER_FACTORY.newSAXParser().getXMLReader();
+      xmlReader = XmlUtil.createSaxParser().getXMLReader();
       // Note:
       // There is a compatibility problem here: JAXP default is false while SAX 2 default is true!
       // OpenNLP requires it activated!
