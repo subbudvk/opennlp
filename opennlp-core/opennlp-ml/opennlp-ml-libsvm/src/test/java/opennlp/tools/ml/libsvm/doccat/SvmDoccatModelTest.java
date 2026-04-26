@@ -19,7 +19,9 @@ package opennlp.tools.ml.libsvm.doccat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -130,6 +132,18 @@ class SvmDoccatModelTest {
     byte[] garbage = {0x00, 0x01, 0x02};
     assertThrows(IOException.class, () ->
         SvmDoccatModel.deserialize(new ByteArrayInputStream(garbage)));
+  }
+
+  @Test
+  void testDeserialize_RejectsForeignClass() throws IOException {
+    // Serialize an unrelated class — before fix this completes readObject() then throws ClassCastException.
+    // After fix the filter rejects it with InvalidClassException (an IOException).
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+      oos.writeObject(new File("/tmp/poc"));
+    }
+    assertThrows(IOException.class, () ->
+        SvmDoccatModel.deserialize(new ByteArrayInputStream(baos.toByteArray())));
   }
 
   private SvmDoccatModel trainSimpleModel() throws IOException {
