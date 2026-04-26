@@ -19,6 +19,7 @@ package opennlp.tools.ml.libsvm.doccat;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputFilter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -191,8 +192,21 @@ public class SvmDoccatModel implements Serializable {
    * @throws IOException Thrown if IO errors occurred during deserialization.
    * @throws ClassNotFoundException Thrown if required classes are not found.
    */
+  private static final ObjectInputFilter DESERIALIZE_FILTER = ObjectInputFilter.Config.createFilter(
+      "opennlp.tools.ml.libsvm.doccat.*;" +
+      "de.hhn.mi.**;" +
+      "libsvm.*;" +
+      "java.util.*;" +
+      "java.lang.Number;" +
+      "java.lang.Integer;" +
+      "java.lang.Double;" +
+      "java.lang.Enum;" +
+      "java.lang.String;" +
+      "!*");
+
   public static SvmDoccatModel deserialize(InputStream in) throws IOException, ClassNotFoundException {
     try (ObjectInputStream ois = new ObjectInputStream(in)) {
+      ois.setObjectInputFilter(DESERIALIZE_FILTER);
       return (SvmDoccatModel) ois.readObject();
     }
   }
